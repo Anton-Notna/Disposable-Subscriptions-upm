@@ -5,10 +5,25 @@ namespace DisposableSubscriptions
 {
     public class UpdatableCollection<T> : IUpdatableCollection<T> where T : IIdentifiable
     {
+        private class Delta : IDelta<T>
+        {
+            public T Previous { get; set; }
+
+            public IUpdatable<T> Current { get; set; }
+
+            public Delta Set(T previous, IUpdatable<T> current)
+            {
+                Current = current;
+                Previous = previous;
+                return this;
+            }
+        }
+
         private readonly Dictionary<int, Updatable<T>> _units = new Dictionary<int, Updatable<T>>();
         private readonly Event<IUpdatable<T>> _unitCreated = new Event<IUpdatable<T>>();
         private readonly Event<IUpdatable<T>> _unitRemoving = new Event<IUpdatable<T>>();
-        private readonly Event<(T, IUpdatable<T>)> _unitUpdated = new Event<(T, IUpdatable<T>)>();
+        private readonly Event<IDelta<T>> _unitUpdated = new Event<IDelta<T>>();
+        private readonly Delta _delta = new Delta();
 
         public IReadOnlyCollection<IUpdatable<T>> Collection => _units.Values;
 
@@ -16,18 +31,16 @@ namespace DisposableSubscriptions
 
         public IEvent<IUpdatable<T>> UnitRemoving => _unitRemoving;
 
-        public IEvent<(T, IUpdatable<T>)> UnitUpdated => _unitUpdated;
+        public IEvent<IDelta<T>> UnitUpdated => _unitUpdated;
 
-        public bool Get(int id, out IUpdatable<T> item)
+        public bool Contains(int id) => _units.ContainsKey(id);
+
+        public IUpdatable<T> Get(int id)
         {
             if (_units.TryGetValue(id, out Updatable<T> value))
-            {
-                item = value;
-                return true;
-            }
+                return value;
 
-            item = null;
-            return false;
+            return null;
         }
 
         public void UpdateAndRemoveUnused(IEnumerable<T> values)
@@ -114,7 +127,7 @@ namespace DisposableSubscriptions
 
             T previous = unit.Current;
             unit.Update(value);
-            _unitUpdated.Update((previous, unit));
+            _unitUpdated.Update(_delta.Set(previous, unit));
             return true;
         }
     }
