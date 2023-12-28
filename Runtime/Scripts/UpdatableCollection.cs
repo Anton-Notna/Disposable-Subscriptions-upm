@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DisposableSubscriptions
 {
@@ -107,10 +108,8 @@ namespace DisposableSubscriptions
 
         public void RemoveAll()
         {
-            foreach (var unit in _units.Values)
-                _unitRemoving.Update(unit);
-            
-            _units.Clear();
+            while (_units.Count > 0)
+                Remove(_units.Keys.First());
         }
 
         private void CreateUnit(T value)
