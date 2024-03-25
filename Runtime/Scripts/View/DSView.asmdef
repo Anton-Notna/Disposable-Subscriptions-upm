@@ -1,0 +1,16 @@
+{
+    "name": "DSView",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8e068e31bb298bb4a886fdf75c4246bc"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
