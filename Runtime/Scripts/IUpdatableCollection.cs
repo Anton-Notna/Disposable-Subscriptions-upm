@@ -8,7 +8,15 @@ namespace DisposableSubscriptions
 
         public IEvent<IDelta<T>> UnitUpdated { get; }
 
+        /// <summary>
+        /// Calls BEFORE unit removed from Collection
+        /// </summary>
         public IEvent<IUpdatable<T>> UnitRemoving { get; }
+
+        /// <summary>
+        /// Calls AFTER unit removed from Collection
+        /// </summary>
+        public IEvent<IUpdatable<T>> UnitRemoved { get; }
 
         public IReadOnlyCollection<IUpdatable<T>> Collection { get; }
 

@@ -2,6 +2,9 @@
 
 ## Changelog
 
+### 1.2.1 (Martch 25, 2024)
++ add IUpdatableCollection.UnitRemoved
+
 ### 1.1.5 (Martch 25, 2024)
 + add views for collections
 

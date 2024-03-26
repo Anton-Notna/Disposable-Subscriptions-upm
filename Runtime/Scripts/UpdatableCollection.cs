@@ -23,6 +23,8 @@ namespace DisposableSubscriptions
         private readonly Dictionary<int, Updatable<T>> _units = new Dictionary<int, Updatable<T>>();
         private readonly Event<IUpdatable<T>> _unitCreated = new Event<IUpdatable<T>>();
         private readonly Event<IUpdatable<T>> _unitRemoving = new Event<IUpdatable<T>>();
+        private readonly Event<IUpdatable<T>> _unitRemoved = new Event<IUpdatable<T>>();
+
         private readonly Event<IDelta<T>> _unitUpdated = new Event<IDelta<T>>();
         private readonly Delta _delta = new Delta();
 
@@ -31,6 +33,8 @@ namespace DisposableSubscriptions
         public IEvent<IUpdatable<T>> UnitAdded => _unitCreated;
 
         public IEvent<IUpdatable<T>> UnitRemoving => _unitRemoving;
+
+        public IEvent<IUpdatable<T>> UnitRemoved => _unitRemoved;
 
         public IEvent<IDelta<T>> UnitUpdated => _unitUpdated;
 
@@ -103,6 +107,7 @@ namespace DisposableSubscriptions
 
             _unitRemoving.Update(unit);
             _units.Remove(id);
+            _unitRemoved.Update(unit);
             return true;
         }
 
