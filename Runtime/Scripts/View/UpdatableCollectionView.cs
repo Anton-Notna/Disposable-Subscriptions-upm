@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static PlasticPipe.Server.MonitorStats;
 
 namespace DisposableSubscriptions.View
 {
@@ -13,18 +14,20 @@ namespace DisposableSubscriptions.View
 
         private readonly Dictionary<int, TView> _spawnedUnits = new Dictionary<int, TView>();
         private readonly List<IDisposable> _subs = new List<IDisposable>();
-     
+
+        private IUpdatableCollection<TData> _dataToSubscribe;
+        private IUpdatableCollection<TData> _currentData;
+
         public IReadOnlyDictionary<int, TView> SpawnedUnits => _spawnedUnits;
 
         public void Init(IUpdatableCollection<TData> data)
         {
             Clear();
 
-            _subs.Add(data.UnitAdded.Subscribe(Spawn));
-            _subs.Add(data.UnitRemoving.Subscribe(Remove));
-
-            foreach (var unit in data.Collection)
-                Spawn(unit);
+            if (gameObject.activeInHierarchy && gameObject.activeInHierarchy)
+                Subscribe(data);
+            else
+                _dataToSubscribe = data;
         }
 
         protected virtual void OnSpawned(TView unit) { }
@@ -41,7 +44,33 @@ namespace DisposableSubscriptions.View
 
         protected virtual TView InstantiateView(TView prefab, Vector3 position, Quaternion rotation, Transform parent) => Instantiate(prefab, position, rotation, parent);
 
-        private void OnDestroy() => Clear();
+        /// <summary>!!! Need to call base.OnEnable !!!</summary>
+        protected virtual void OnEnable()
+        {
+            if (_dataToSubscribe == null)
+                return;
+
+            Subscribe(_dataToSubscribe);
+            _dataToSubscribe = null;
+        }
+
+        /// <summary>!!! Need to call base.OnDisable !!!</summary>
+        protected virtual void OnDisable()
+        {
+            _dataToSubscribe = _currentData;
+            Clear();
+        }
+
+        private void Subscribe(IUpdatableCollection<TData> data)
+        {
+            Clear();
+            _currentData = data;
+            _subs.Add(_currentData.UnitAdded.Subscribe(Spawn));
+            _subs.Add(_currentData.UnitRemoving.Subscribe(Remove));
+
+            foreach (var unit in _currentData.Collection)
+                Spawn(unit);
+        }
 
         private void Spawn(IUpdatable<TData> updatable)
         {
@@ -68,6 +97,7 @@ namespace DisposableSubscriptions.View
 
         private void Clear()
         {
+            _currentData = null;
             _subs.TryDispose();
 
             if (_spawnedUnits.Count == 0)

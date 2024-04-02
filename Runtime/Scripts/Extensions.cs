@@ -10,6 +10,9 @@ namespace DisposableSubscriptions
             if (subs == null)
                 return;
 
+            if (subs.Count == 0)
+                return;
+
             for (int i = 0; i < subs.Count; i++)
                 subs[i].TryDispose();
 
