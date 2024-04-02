@@ -29,6 +29,8 @@ namespace DisposableSubscriptions.View
 
         protected virtual void OnSpawned(TView unit) { }
 
+        protected virtual void OnRemoved(TView unit) { }
+
         protected virtual bool NeedSpawn(TData data) => true;
 
         protected virtual TView GetPrefab(TData data) => _prefab;
@@ -40,6 +42,7 @@ namespace DisposableSubscriptions.View
         protected virtual TView InstantiateView(TView prefab, Vector3 position, Quaternion rotation, Transform parent) => Instantiate(prefab, position, rotation, parent);
 
         private void OnDestroy() => Clear();
+
         private void Spawn(IUpdatable<TData> updatable)
         {
             TData data = updatable.Current;
@@ -59,10 +62,14 @@ namespace DisposableSubscriptions.View
             if (unit != null && unit.gameObject != null)
                 Destroy(unit.gameObject);
             _spawnedUnits.Remove(updatable.Current.ID);
+
+            OnRemoved(unit);
         }
 
         private void Clear()
         {
+            _subs.TryDispose();
+
             if (_spawnedUnits.Count == 0)
                 return;
 
