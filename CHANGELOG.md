@@ -2,6 +2,9 @@
 
 ## Changelog
 
+### 1.2.4 (April 4, 2024)
++ again fix subscribe behavior in views in onEnable/onDisable cases
+
 ### 1.2.3 (April 4, 2024)
 + fix subscribe behavior in views in onEnable/onDisable cases
 

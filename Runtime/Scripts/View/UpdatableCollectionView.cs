@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using static PlasticPipe.Server.MonitorStats;
 
@@ -83,14 +84,16 @@ namespace DisposableSubscriptions.View
             OnSpawned(unit);
         }
 
-        private void Remove(IUpdatable<TData> updatable)
+        private void Remove(IUpdatable<TData> updatable) => Remove(updatable.Current.ID);
+
+        private void Remove(int id)
         {
-            if (_spawnedUnits.TryGetValue(updatable.Current.ID, out var unit) == false)
+            if (_spawnedUnits.TryGetValue(id, out var unit) == false)
                 return;
 
             if (unit != null && unit.gameObject != null)
                 Destroy(unit.gameObject);
-            _spawnedUnits.Remove(updatable.Current.ID);
+            _spawnedUnits.Remove(id);
 
             OnRemoved(unit);
         }
@@ -100,16 +103,8 @@ namespace DisposableSubscriptions.View
             _currentData = null;
             _subs.TryDispose();
 
-            if (_spawnedUnits.Count == 0)
-                return;
-
-            foreach (var unit in _spawnedUnits.Values)
-            {
-                if (unit != null && unit.gameObject != null)
-                    Destroy(unit.gameObject);
-            }
-
-            _spawnedUnits.Clear();
+            while (_spawnedUnits.Count != 0)
+                Remove(_spawnedUnits.Keys.First());
         }
     }
 }
