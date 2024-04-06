@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DisposableSubscriptions
 {
-    public class Event<T> : IEvent<T>
+    public class Event<T> : IEvent<T>, UnsubscribeTarget<Action<T>>
     {
         private readonly List<Action<T>> _observers = new List<Action<T>>();
+        private readonly CopiedList<Action<T>> _toListObservers = new CopiedList<Action<T>>();
+        private int _observersHash;
 
         public IDisposable Subscribe(Action<T> observer)
         {
@@ -14,9 +15,21 @@ namespace DisposableSubscriptions
                 throw new ArgumentNullException(nameof(observer));
 
             if (_observers.Contains(observer) == false)
+            {
                 _observers.Add(observer);
+                _observersHash++;
+            }
 
-            return new Unsubscriber<Action<T>>(_observers, observer);
+            return new Unsubscriber<Action<T>>(this, observer);
+        }
+
+        public void Unsubscribe(Action<T> observer)
+        {
+            if (_observers.Contains(observer))
+            {
+                _observers.Remove(observer);
+                _observersHash++;
+            }
         }
 
         public void Update(T value)
@@ -26,8 +39,10 @@ namespace DisposableSubscriptions
             if (_observers.Count == 0)
                 return;
 
-            foreach (Action<T> observer in _observers.ToList())
-                observer?.Invoke(value);
+            _toListObservers.CopyFrom(_observers, _observersHash);
+            int count = _toListObservers.Count;
+            for (int i = 0; i < count; i++)
+                _toListObservers[i]?.Invoke(value);
         }
 
         protected virtual void OnUpdating(T value) { }

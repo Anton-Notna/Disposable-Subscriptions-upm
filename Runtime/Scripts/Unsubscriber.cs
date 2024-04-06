@@ -5,19 +5,24 @@ namespace DisposableSubscriptions
 {
     public class Unsubscriber<T> : IDisposable
     {
-        private readonly List<T> _observers;
+        private readonly UnsubscribeTarget<T> _target;
         private readonly T _observer;
 
-        public Unsubscriber(List<T> observers, T observer)
+        public Unsubscriber(UnsubscribeTarget<T> observers, T observer)
         {
-            _observers = observers;
+            _target = observers;
             _observer = observer;
         }
 
         public void Dispose()
         {
-            if (_observer != null && _observers.Contains(_observer))
-                _observers.Remove(_observer);
+            if (_observer != null && _target != null)
+                _target.Unsubscribe(_observer);
         }
+    }
+
+    public interface UnsubscribeTarget<T>
+    {
+        public void Unsubscribe(T observer);
     }
 }
