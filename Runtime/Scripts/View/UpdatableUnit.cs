@@ -9,7 +9,7 @@ namespace DisposableSubscriptions.View
         private IDisposable _sub;
         private Action<TSelf> _updated;
 
-        public TSelf Init(IUpdatable<TData> data, Action<TSelf> updated)
+        public TSelf Init(IUpdatable<TData> data, Action<TSelf> updated = null)
         {
             _sub.TryDispose();
             _data = data;
@@ -23,7 +23,7 @@ namespace DisposableSubscriptions.View
         public void RefreshData(TData data)
         {
             Refresh(data);
-            _updated.Invoke((TSelf)this);
+            _updated?.Invoke((TSelf)this);
         }
 
         protected abstract void Refresh(TData unit);

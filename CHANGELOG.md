@@ -2,6 +2,9 @@
 
 ## Changelog
 
+### 1.4.0 (April 9, 2024)
++ add UpdatablePromise
+
 ### 1.3.2 (April 9, 2024)
 + polish OnUpdated in view collections
 
