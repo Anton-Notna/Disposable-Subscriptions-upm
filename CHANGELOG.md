@@ -2,6 +2,9 @@
 
 ## Changelog
 
+### 1.3.1 (April 9, 2024)
++ add OnUpdated in view collections
+
 ### 1.3.0 (April 6, 2024)
 + zero allocations and optimization on Updatable.Update calls 
 

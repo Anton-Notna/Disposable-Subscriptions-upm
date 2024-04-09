@@ -32,6 +32,8 @@ namespace DisposableSubscriptions.View
 
         protected virtual void OnSpawned(TView unit) { }
 
+        protected virtual void OnUpdated(TView unit) { }
+
         protected virtual void OnRemoved(TView unit) { }
 
         protected virtual bool NeedSpawn(TData data) => true;
@@ -78,7 +80,7 @@ namespace DisposableSubscriptions.View
             if (NeedSpawn(data) == false)
                 return;
             (Vector3 Position, Quaternion Rotation) location = ComputeSpawnPosition(data);
-            var unit = InstantiateView(GetPrefab(data), location.Position, location.Rotation, ComputeParent(data)).Init(updatable);
+            var unit = InstantiateView(GetPrefab(data), location.Position, location.Rotation, ComputeParent(data)).Init(updatable, OnUpdated);
             _spawnedUnits.Add(updatable.Current.ID, unit);
             OnSpawned(unit);
         }

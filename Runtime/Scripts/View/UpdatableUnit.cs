@@ -7,20 +7,22 @@ namespace DisposableSubscriptions.View
     {
         private IUpdatable<TData> _data;
         private IDisposable _sub;
+        private Action<TSelf> _updated;
 
-        public TSelf Init(IUpdatable<TData> data)
+        public TSelf Init(IUpdatable<TData> data, Action<TSelf> updated)
         {
             _sub.TryDispose();
             _data = data;
-            _sub = data.Subscribe(Refresh);
-            Refresh(_data.Current);
+            _updated = updated;
+            _sub = data.Subscribe(RefreshData);
+            RefreshData(_data.Current);
 
             return (TSelf)this;
         }
 
         public abstract void Refresh(TData unit);
 
-        protected void ForceRefresh() => Refresh(_data.Current);
+        protected void ForceRefresh() => RefreshData(_data.Current);
 
         protected virtual void OnDestroying() { }
 
@@ -28,6 +30,11 @@ namespace DisposableSubscriptions.View
         {
             _sub.TryDispose();
             OnDestroying();
+        }
+        private void RefreshData(TData data)
+        {
+            Refresh(data);
+            _updated.Invoke((TSelf)this);
         }
     }
 }
