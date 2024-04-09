@@ -2,6 +2,9 @@
 
 ## Changelog
 
+### 1.3.2 (April 9, 2024)
++ polish OnUpdated in view collections
+
 ### 1.3.1 (April 9, 2024)
 + add OnUpdated in view collections
 

@@ -20,7 +20,13 @@ namespace DisposableSubscriptions.View
             return (TSelf)this;
         }
 
-        public abstract void Refresh(TData unit);
+        public void RefreshData(TData data)
+        {
+            Refresh(data);
+            _updated.Invoke((TSelf)this);
+        }
+
+        protected abstract void Refresh(TData unit);
 
         protected void ForceRefresh() => RefreshData(_data.Current);
 
@@ -31,10 +37,6 @@ namespace DisposableSubscriptions.View
             _sub.TryDispose();
             OnDestroying();
         }
-        private void RefreshData(TData data)
-        {
-            Refresh(data);
-            _updated.Invoke((TSelf)this);
-        }
+
     }
 }
