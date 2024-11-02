@@ -24,5 +24,12 @@ namespace DisposableSubscriptions
             if (sub != null)
                 sub.Dispose();
         }
+
+        public static void SubscribeToAnyUpdate<T>(this IUpdatableCollection<T> collection, List<IDisposable> subs, Action action)
+        {
+            subs.Add(collection.UnitAdded.Subscribe(_ => action.Invoke()));
+            subs.Add(collection.UnitRemoved.Subscribe(_ => action.Invoke()));
+            subs.Add(collection.UnitUpdated.Subscribe(_ => action.Invoke()));
+        }
     }
 }

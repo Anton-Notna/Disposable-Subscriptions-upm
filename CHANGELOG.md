@@ -2,6 +2,9 @@
 
 ## Changelog
 
+### 1.5.0 (November 2, 2024)
++ add SubscribeToAnyUpdate extension method to collections
+
 ### 1.4.0 (April 9, 2024)
 + add UpdatablePromise
 
