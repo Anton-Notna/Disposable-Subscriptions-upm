@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,6 +29,8 @@ namespace DisposableSubscriptions
         private readonly Event<IDelta<T>> _unitUpdated = new Event<IDelta<T>>();
         private readonly Delta _delta = new Delta();
 
+        private IEnumerator<IUpdatable<T>> _enumerator;
+
         public IReadOnlyCollection<IUpdatable<T>> Collection => _units.Values;
 
         public IEvent<IUpdatable<T>> UnitAdded => _unitCreated;
@@ -37,6 +40,16 @@ namespace DisposableSubscriptions
         public IEvent<IUpdatable<T>> UnitRemoved => _unitRemoved;
 
         public IEvent<IDelta<T>> UnitUpdated => _unitUpdated;
+
+        public IEnumerator<IUpdatable<T>> GetEnumerator()
+        {
+            if (_enumerator == null)
+                _enumerator = _units.Values.GetEnumerator();
+
+            return _enumerator;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public bool Contains(int id) => _units.ContainsKey(id);
 
@@ -107,6 +120,7 @@ namespace DisposableSubscriptions
 
             _unitRemoving.Update(unit);
             _units.Remove(id);
+            _enumerator = null;
             _unitRemoved.Update(unit);
             return true;
         }
@@ -121,6 +135,7 @@ namespace DisposableSubscriptions
         {
             Updatable<T> unit = new Updatable<T>(value);
             _units.Add(value.ID, unit);
+            _enumerator = null;
             _unitCreated.Update(unit);
         }
 

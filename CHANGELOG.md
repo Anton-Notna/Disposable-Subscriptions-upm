@@ -2,6 +2,9 @@
 
 ## Changelog
 
+### 1.6.0 (December 2, 2024)
++ add IUpdatableCollection.GetEnumerator as alternative to IUpdatableCollection.Collection
+
 ### 1.5.0 (November 2, 2024)
 + add SubscribeToAnyUpdate extension method to collections
 

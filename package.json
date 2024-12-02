@@ -1,9 +1,14 @@
 {
     "name": "com.omicronperson.disposablesubscriptions",
     "displayName": "Disposable Subscriptions",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "description": "",
     "unity": "2022.3",
     "dependencies": {},
-    "keywords": []
+    "keywords": [],
+	"author":
+	{
+		"name": "OmicronPerson",
+		"url": "https://github.com/Anton-Notna"
+	}
 }
