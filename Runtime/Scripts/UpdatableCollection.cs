@@ -22,6 +22,7 @@ namespace DisposableSubscriptions
         }
 
         private readonly Dictionary<int, Updatable<T>> _units = new Dictionary<int, Updatable<T>>();
+        private readonly List<IUpdatable<T>> _collection = new List<IUpdatable<T>>();
         private readonly Event<IUpdatable<T>> _unitCreated = new Event<IUpdatable<T>>();
         private readonly Event<IUpdatable<T>> _unitRemoving = new Event<IUpdatable<T>>();
         private readonly Event<IUpdatable<T>> _unitRemoved = new Event<IUpdatable<T>>();
@@ -29,9 +30,25 @@ namespace DisposableSubscriptions
         private readonly Event<IDelta<T>> _unitUpdated = new Event<IDelta<T>>();
         private readonly Delta _delta = new Delta();
 
-        private IEnumerator<IUpdatable<T>> _enumerator;
+        private bool _dirtyCollection = true;
 
-        public IReadOnlyCollection<IUpdatable<T>> Collection => _units.Values;
+        public IReadOnlyList<IUpdatable<T>> Collection
+        {
+            get
+            {
+                if (_dirtyCollection)
+                {
+                    if (_collection.Count > 0)
+                        _collection.Clear();
+
+                    _collection.AddRange(_units.Values);
+
+                    _dirtyCollection = false;
+                }
+
+                return _collection;
+            }
+        }
 
         public IEvent<IUpdatable<T>> UnitAdded => _unitCreated;
 
@@ -41,13 +58,7 @@ namespace DisposableSubscriptions
 
         public IEvent<IDelta<T>> UnitUpdated => _unitUpdated;
 
-        public IEnumerator<IUpdatable<T>> GetEnumerator()
-        {
-            if (_enumerator == null)
-                _enumerator = _units.Values.GetEnumerator();
-
-            return _enumerator;
-        }
+        public IEnumerator<IUpdatable<T>> GetEnumerator() => Collection.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -120,7 +131,7 @@ namespace DisposableSubscriptions
 
             _unitRemoving.Update(unit);
             _units.Remove(id);
-            _enumerator = null;
+            _dirtyCollection = true;
             _unitRemoved.Update(unit);
             return true;
         }
@@ -135,7 +146,7 @@ namespace DisposableSubscriptions
         {
             Updatable<T> unit = new Updatable<T>(value);
             _units.Add(value.ID, unit);
-            _enumerator = null;
+            _dirtyCollection = true;
             _unitCreated.Update(unit);
         }
 

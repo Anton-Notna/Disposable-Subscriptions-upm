@@ -2,6 +2,9 @@
 
 ## Changelog
 
+### 1.6.1 (December 2, 2024)
++ now IUpdatableCollection.Collection is IReadOnlyList
+
 ### 1.6.0 (December 2, 2024)
 + add IUpdatableCollection.GetEnumerator as alternative to IUpdatableCollection.Collection
 

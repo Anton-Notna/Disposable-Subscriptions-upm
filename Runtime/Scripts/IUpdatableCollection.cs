@@ -18,10 +18,7 @@ namespace DisposableSubscriptions
         /// </summary>
         public IEvent<IUpdatable<T>> UnitRemoved { get; }
 
-        /// <summary>
-        /// You can use IUpdatableCollection.GetEnumerator as alternative
-        /// </summary>
-        public IReadOnlyCollection<IUpdatable<T>> Collection { get; }
+        public IReadOnlyList<IUpdatable<T>> Collection { get; }
 
         public bool Contains(int id);
 
